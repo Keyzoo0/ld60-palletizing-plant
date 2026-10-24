@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!--
+  Box truck at the loading dock. Origin = centre of the open rear end, on the floor.
+  Cargo box: 6.8 m long (+X), 2.4 m wide, 2.6 m high inside. The cargo floor is level with the
+  plant floor (simplification: in reality a dock leveller bridges the truck bed height).
+-->
+<sdf version="1.9">
+  <model name="box_truck">
+    <static>true</static>
+    <link name="body">
+      <!-- cargo box walls -->
+      <collision name="wall_left"><pose>3.4 1.235 1.35 0 0 0</pose><geometry><box><size>6.8 0.07 2.7</size></box></geometry></collision>
+      <collision name="wall_right"><pose>3.4 -1.235 1.35 0 0 0</pose><geometry><box><size>6.8 0.07 2.7</size></box></geometry></collision>
+      <collision name="wall_front"><pose>6.835 0 1.35 0 0 0</pose><geometry><box><size>0.07 2.54 2.7</size></box></geometry></collision>
+      <collision name="roof"><pose>3.4 0 2.735 0 0 0</pose><geometry><box><size>6.87 2.54 0.07</size></box></geometry></collision>
+
+      <visual name="wall_left"><pose>3.4 1.235 1.35 0 0 0</pose><geometry><box><size>6.8 0.07 2.7</size></box></geometry>
+        <material><ambient>0.93 0.94 0.95 1</ambient><diffuse>0.93 0.94 0.95 1</diffuse></material></visual>
+      <visual name="wall_right"><pose>3.4 -1.235 1.35 0 0 0</pose><geometry><box><size>6.8 0.07 2.7</size></box></geometry>
+        <material><ambient>0.93 0.94 0.95 1</ambient><diffuse>0.93 0.94 0.95 1</diffuse></material></visual>
+      <visual name="wall_front"><pose>6.835 0 1.35 0 0 0</pose><geometry><box><size>0.07 2.54 2.7</size></box></geometry>
+        <material><ambient>0.90 0.91 0.92 1</ambient><diffuse>0.90 0.91 0.92 1</diffuse></material></visual>
+      <visual name="roof"><pose>3.4 0 2.735 0 0 0</pose><geometry><box><size>6.87 2.54 0.07</size></box></geometry>
+        <material><ambient>0.85 0.86 0.88 1</ambient><diffuse>0.85 0.86 0.88 1</diffuse></material></visual>
+      <visual name="stripe_left"><pose>3.4 1.272 1.0 0 0 0</pose><geometry><box><size>6.8 0.005 0.25</size></box></geometry>
+        <material><ambient>0.0 0.36 0.67 1</ambient><diffuse>0.0 0.36 0.67 1</diffuse></material></visual>
+      <visual name="stripe_right"><pose>3.4 -1.272 1.0 0 0 0</pose><geometry><box><size>6.8 0.005 0.25</size></box></geometry>
+        <material><ambient>0.0 0.36 0.67 1</ambient><diffuse>0.0 0.36 0.67 1</diffuse></material></visual>
+      <visual name="floor"><pose>3.4 0 0.003 0 0 0</pose><geometry><box><size>6.8 2.4 0.006</size></box></geometry>
+        <material><ambient>0.35 0.30 0.25 1</ambient><diffuse>0.35 0.30 0.25 1</diffuse></material></visual>
+      <!-- open rear doors swung to the sides -->
+      <visual name="door_left"><pose>-0.03 1.85 1.35 0 0 0</pose><geometry><box><size>0.04 1.2 2.6</size></box></geometry>
+        <material><ambient>0.88 0.89 0.90 1</ambient><diffuse>0.88 0.89 0.90 1</diffuse></material></visual>
+      <visual name="door_right"><pose>-0.03 -1.85 1.35 0 0 0</pose><geometry><box><size>0.04 1.2 2.6</size></box></geometry>
+        <material><ambient>0.88 0.89 0.90 1</ambient><diffuse>0.88 0.89 0.90 1</diffuse></material></visual>
+
+      <!-- cab -->
+      <collision name="cab"><pose>8.0 0 1.4 0 0 0</pose><geometry><box><size>2.2 2.4 2.0</size></box></geometry></collision>
+      <visual name="cab"><pose>8.0 0 1.45 0 0 0</pose><geometry><box><size>2.2 2.4 2.1</size></box></geometry>
+        <material><ambient>0.0 0.36 0.67 1</ambient><diffuse>0.0 0.36 0.67 1</diffuse></material></visual>
+      <visual name="windshield"><pose>9.105 0 1.95 0 0 0</pose><geometry><box><size>0.02 2.1 0.8</size></box></geometry>
+        <material><ambient>0.12 0.16 0.22 1</ambient><diffuse>0.12 0.16 0.22 1</diffuse></material></visual>
+      <visual name="wheel_rl"><pose>1.6 1.42 0.45 1.5708 0 0</pose><geometry><cylinder><radius>0.45</radius><length>0.3</length></cylinder></geometry>
+        <material><ambient>0.07 0.07 0.07 1</ambient><diffuse>0.07 0.07 0.07 1</diffuse></material></visual>
+      <visual name="wheel_rr"><pose>1.6 -1.42 0.45 1.5708 0 0</pose><geometry><cylinder><radius>0.45</radius><length>0.3</length></cylinder></geometry>
+        <material><ambient>0.07 0.07 0.07 1</ambient><diffuse>0.07 0.07 0.07 1</diffuse></material></visual>
+      <visual name="wheel_fl"><pose>8.0 1.42 0.45 1.5708 0 0</pose><geometry><cylinder><radius>0.45</radius><length>0.3</length></cylinder></geometry>
+        <material><ambient>0.07 0.07 0.07 1</ambient><diffuse>0.07 0.07 0.07 1</diffuse></material></visual>
+      <visual name="wheel_fr"><pose>8.0 -1.42 0.45 1.5708 0 0</pose><geometry><cylinder><radius>0.45</radius><length>0.3</length></cylinder></geometry>
+        <material><ambient>0.07 0.07 0.07 1</ambient><diffuse>0.07 0.07 0.07 1</diffuse></material></visual>
+    </link>
+  </model>
+</sdf>

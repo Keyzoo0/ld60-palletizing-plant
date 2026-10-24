@@ -1,0 +1,12 @@
+﻿[wsl2]
+# Laptop: i7-13620H (16 threads), 16 GB RAM. Give WSL most of the CPU for Gazebo/MoveIt,
+# keep enough RAM for Windows (TMflow etc.).
+memory=9GB
+swap=4GB
+processors=12
+guiApplications=true
+# NAT networking (default): ROS 2 DDS discovery works. "networkingMode=mirrored" gives internet
+# when NAT is blocked, but breaks ROS 2 discovery here - only switch to it temporarily.
+dnsTunneling=true
+
+

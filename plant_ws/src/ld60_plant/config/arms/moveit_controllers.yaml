@@ -1,0 +1,68 @@
+moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
+moveit_simple_controller_manager:
+  controller_names:
+  - a1_controller
+  - a2_controller
+  - a3_controller
+  - a4_controller
+  - t1_controller
+  a1_controller:
+    type: FollowJointTrajectory
+    action_ns: follow_joint_trajectory
+    default: true
+    joints:
+    - a1_joint_1
+    - a1_joint_2
+    - a1_joint_3
+    - a1_joint_4
+    - a1_joint_5
+    - a1_joint_6
+  a2_controller:
+    type: FollowJointTrajectory
+    action_ns: follow_joint_trajectory
+    default: true
+    joints:
+    - a2_joint_1
+    - a2_joint_2
+    - a2_joint_3
+    - a2_joint_4
+    - a2_joint_5
+    - a2_joint_6
+  a3_controller:
+    type: FollowJointTrajectory
+    action_ns: follow_joint_trajectory
+    default: true
+    joints:
+    - a3_joint_1
+    - a3_joint_2
+    - a3_joint_3
+    - a3_joint_4
+    - a3_joint_5
+    - a3_joint_6
+  a4_controller:
+    type: FollowJointTrajectory
+    action_ns: follow_joint_trajectory
+    default: true
+    joints:
+    - a4_joint_1
+    - a4_joint_2
+    - a4_joint_3
+    - a4_joint_4
+    - a4_joint_5
+    - a4_joint_6
+  t1_controller:
+    type: FollowJointTrajectory
+    action_ns: follow_joint_trajectory
+    default: true
+    joints:
+    - t1_joint_1
+    - t1_joint_2
+    - t1_joint_3
+    - t1_joint_4
+    - t1_joint_5
+    - t1_joint_6
+trajectory_execution:
+  allowed_execution_duration_scaling: 1.5
+  allowed_goal_duration_margin: 2.0
+  allowed_start_tolerance: 0.02
+  execution_duration_monitoring: true

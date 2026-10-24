@@ -1,0 +1,102 @@
+# LD-60 plant configuration (units: m, deg, s)
+# Motion limits come from the real LD-60 config embedded in the training-site map
+# (D:\PT ELMCECON\AMR TRAINING\MobilePlanner Maps\ld_omron.map): TransVelMax 1350 mm/s, TransAccel/Decel 300-400 mm/s2,
+# RotVelMax 140 deg/s, GoalDistanceTol 30 mm, GoalAngleTol 2 deg.
+robot:
+  name: ld60
+  length: 0.699
+  width: 0.50
+  max_speed: 1.35          # absolute cap (map: AbsoluteMaxTransVel)
+  cruise_speed: 1.0        # default driving speed, adjustable from the dashboard
+  accel: 0.35
+  decel: 0.35
+  reverse_speed: 0.25      # reversing out of a dock
+  dock_speed: 0.15         # final approach into a dock
+  dock_slow_distance: 0.6
+  rot_speed: 90.0          # deg/s (map max 140)
+  rot_accel: 150.0         # deg/s2
+  goal_distance_tol: 0.03
+  goal_angle_tol: 2.0
+  dock_distance_tol: 0.008
+  dock_angle_tol: 0.7
+  roller_speed: 0.15       # m/s, pallet transfer
+
+# Goals ("Cairns" in MobilePlanner). dock: approach the last segment straight, no turning at the goal.
+goals:
+  Home:          {x: 2.20,  y: -3.00, yaw: 90.0,  dock: true,  label: "Home / Charger"}
+  PalletStation: {x: 0.87,  y: 0.00,  yaw: 180.0, dock: true,  label: "Pallet Station", station: pallet_station}
+  TruckDock:     {x: 12.33, y: 0.00,  yaw: 0.0,   dock: true,  label: "Truck Dock",     station: truck_station}
+
+# Route nodes (junctions) and the fixed paths between them
+nodes:
+  J_Home:  {x: 2.20,  y: 0.00}
+  J_Dock:  {x: 10.60, y: 0.00}
+
+edges:
+  - [Home, J_Home]
+  - [J_Home, PalletStation]
+  - [J_Home, J_Dock]
+  - [J_Dock, TruckDock]
+
+# Powered roller tables. Their rollers run along the model +X axis; the AMR docks at local +X end.
+stations:
+  pallet_station: {x: 0.0,  y: 0.0, yaw: 0.0,   label: "Pallet station"}
+  truck_station:  {x: 13.2, y: 0.0, yaw: 180.0, label: "Truck"}
+
+# ===================== Phase 2: production + palletizing =====================
+production:
+  box: {size: [0.13, 0.10, 0.10], mass: 1.0}   # x (across the belt), y (along the belt), z
+  pallet_top: 0.828          # pallet deck top on the station (0.748 + 0.08)
+  pattern_x: [-0.2175, -0.0725, 0.0725, 0.2175]   # box centres on the pallet (pallet frame): 15 mm gaps
+  pattern_y: [-0.165, -0.055, 0.055, 0.165]        # 10 mm gaps
+  layers: 2                  # 4 x 4 x 2 = 32 boxes per pallet
+  pool_per_lane: 30          # boxes per lane: belt 4 + held 1 + pallet 8 + truck 16 + spare
+  machine_period: 6.0        # s between two boxes from one machine
+  conveyor_speed: 0.20       # m/s
+  conveyor_top: 0.75
+  buffer_max: 4              # machine pauses when this many boxes are on its conveyor
+  dispatch_at: 24            # send the AMR to the station when the pallet holds this many boxes
+
+# arm: base on a 0.5 m pedestal (from the floor the wrist cannot reach the pallet height with the
+#      tool pointing down - see tools/cell_reach2.py); arm_yaw = base rotation, tcp_yaw = tool yaw in
+#      the world (constant, so a box keeps its orientation from conveyor to pallet)
+# conveyor: boxes travel from start to end (end stop), the arm picks at the end
+# quadrant: which quarter of the pallet this arm fills (sign of x, sign of y in the pallet frame)
+# ===================== Phase 3: truck robot =====================
+# 5th TM12S inside the truck, multi-box vacuum gripper: takes one row of 4 boxes off the pallet (rows
+# run along X on the pallet) and stacks it in the cargo area (rows along Y, gripper turned 90 deg).
+# Reach checked with tools/truck_reach.py (base 14.15 / pedestal 0.5 / stack from x 14.65, 6x3 also fits).
+truck_robot:
+  name: T1
+  arm: [14.15, 0.0]
+  arm_yaw: 180.0
+  pedestal_height: 0.5
+  color: "#c77d1a"
+  pallet: [13.2, 0.0]           # pallet centre on the truck station
+  gripper: {length: 0.58, width: 0.09}
+  stack: {x0: 14.65, pitch: 0.11, col_y: 0.33, rows: 4, layers: 2}   # 2 sides x 4 rows x 2 layers = 64 boxes
+  truck_swap_time: 20.0         # s: full truck leaves, an empty one docks
+
+pedestal_height: 0.5
+cells:
+  A1: {arm: [0.32, 0.82],   arm_yaw: -90.0, tcp_yaw: 0.0, conveyor: {start: [0.95, 4.0],   end: [0.95, 1.0]},   quadrant: [1, 1],   color: "#d93a3a"}
+  A2: {arm: [-0.32, 0.82],  arm_yaw: -90.0, tcp_yaw: 0.0, conveyor: {start: [-0.95, 4.0],  end: [-0.95, 1.0]},  quadrant: [-1, 1],  color: "#3a6fe0"}
+  A3: {arm: [-0.32, -0.82], arm_yaw: 90.0,  tcp_yaw: 0.0, conveyor: {start: [-0.95, -4.0], end: [-0.95, -1.0]}, quadrant: [-1, -1], color: "#e6c228"}
+  A4: {arm: [0.32, -0.82],  arm_yaw: 90.0,  tcp_yaw: 0.0, conveyor: {start: [0.95, -4.0],  end: [0.95, -1.0]},  quadrant: [1, -1],  color: "#2fb36b"}
+battery:
+  drain_moving: 0.025      # % per second while driving
+  drain_idle: 0.003
+  drain_rollers: 0.01
+  charge_rate: 0.30        # % per second on the charger
+  low: 20.0
+
+# Drawn on the dashboard map (not used for control)
+layout:
+  hall: {xmin: -6.0, xmax: 12.2, ymin: -8.0, ymax: 8.0}
+  door: {x: 12.2, ymin: -1.6, ymax: 1.6}
+  truck: {xmin: 12.42, xmax: 19.22, ymin: -1.27, ymax: 1.27, cab_xmax: 21.2}
+  charger: {x: 2.2, y: -3.62}
+  zones:
+    - {name: "Palletizing cells", xmin: -1.6, xmax: 1.6, ymin: -5.0, ymax: 5.0, color: "#2a333d"}
+    - {name: "Station", xmin: -0.7, xmax: 1.9, ymin: -0.8, ymax: 0.8, color: "#1f4f8f"}
+    - {name: "Dock", xmin: 10.4, xmax: 12.2, ymin: -1.4, ymax: 1.4, color: "#9a5a14"}

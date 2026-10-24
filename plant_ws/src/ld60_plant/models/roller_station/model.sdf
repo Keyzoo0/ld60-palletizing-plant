@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!--
+  Powered roller table, 1000 x 480 mm deck at 750 mm (same height as the LD-60 roller top).
+  Rollers move along the model +X axis. The AMR docks at the +X end (deck ends at x = +0.5).
+  The legs sit back from the end so a slightly long docking cannot hit them.
+-->
+<sdf version="1.9">
+  <model name="roller_station">
+    <static>true</static>
+    <link name="deck_link">
+      <collision name="deck">
+        <pose>0 0 0.735 0 0 0</pose>
+        <geometry><box><size>1.0 0.48 0.03</size></box></geometry>
+        <surface>
+          <friction><ode><mu>0.8</mu><mu2>150</mu2><fdir1>0 1 0</fdir1></ode></friction>
+        </surface>
+      </collision>
+      <collision name="guide_left">
+        <pose>0 0.255 0.775 0 0 0</pose>
+        <geometry><box><size>1.0 0.02 0.05</size></box></geometry>
+      </collision>
+      <collision name="guide_right">
+        <pose>0 -0.255 0.775 0 0 0</pose>
+        <geometry><box><size>1.0 0.02 0.05</size></box></geometry>
+      </collision>
+      <collision name="stand">
+        <pose>-0.12 0 0.36 0 0 0</pose>
+        <geometry><box><size>0.70 0.40 0.72</size></box></geometry>
+      </collision>
+      <!-- end stop on the far side -->
+      <collision name="end_stop">
+        <pose>-0.51 0 0.79 0 0 0</pose>
+        <geometry><box><size>0.02 0.48 0.08</size></box></geometry>
+      </collision>
+
+      <visual name="stand">
+        <pose>-0.12 0 0.36 0 0 0</pose>
+        <geometry><box><size>0.70 0.40 0.72</size></box></geometry>
+        <material><ambient>0.20 0.22 0.25 1</ambient><diffuse>0.20 0.22 0.25 1</diffuse></material>
+      </visual>
+      <visual name="deck">
+        <pose>0 0 0.727 0 0 0</pose>
+        <geometry><box><size>1.0 0.48 0.014</size></box></geometry>
+        <material><ambient>0.55 0.58 0.62 1</ambient><diffuse>0.55 0.58 0.62 1</diffuse></material>
+      </visual>
+      <visual name="rollers">
+        <pose>0 0 0.742 0 0 0</pose>
+        <geometry><box><size>0.98 0.44 0.012</size></box></geometry>
+        <material><ambient>0.78 0.80 0.83 1</ambient><diffuse>0.78 0.80 0.83 1</diffuse></material>
+      </visual>
+      <visual name="guide_left">
+        <pose>0 0.255 0.775 0 0 0</pose>
+        <geometry><box><size>1.0 0.02 0.05</size></box></geometry>
+        <material><ambient>0.95 0.75 0.10 1</ambient><diffuse>0.95 0.75 0.10 1</diffuse></material>
+      </visual>
+      <visual name="guide_right">
+        <pose>0 -0.255 0.775 0 0 0</pose>
+        <geometry><box><size>1.0 0.02 0.05</size></box></geometry>
+        <material><ambient>0.95 0.75 0.10 1</ambient><diffuse>0.95 0.75 0.10 1</diffuse></material>
+      </visual>
+      <visual name="end_stop">
+        <pose>-0.51 0 0.79 0 0 0</pose>
+        <geometry><box><size>0.02 0.48 0.08</size></box></geometry>
+        <material><ambient>0.85 0.15 0.15 1</ambient><diffuse>0.85 0.15 0.15 1</diffuse></material>
+      </visual>
+    </link>
+    <plugin filename="gz-sim-track-controller-system" name="gz::sim::systems::TrackController">
+      <link>deck_link</link>
+      <odometry_publish_frequency>1</odometry_publish_frequency>
+    </plugin>
+  </model>
+</sdf>

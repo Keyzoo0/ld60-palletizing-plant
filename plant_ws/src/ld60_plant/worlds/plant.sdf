@@ -1,0 +1,155 @@
+<?xml version="1.0" ?>
+<!--
+  LD-60 palletizing plant, phase 1.
+  Hall: x -6 .. 12.2 m, y -8 .. 8 m. Dock door in the +X wall, box truck parked behind it.
+    Pallet station  : roller table centred at (0, 0), AMR docks at its +X end
+    Truck station   : roller table inside the truck at (13, 0), AMR docks at its -X end
+    Home / charger  : (2.2, -3.0)
+  The fixed AMR route is painted on the floor (yellow); see config/plant.yaml.
+-->
+<sdf version="1.9">
+  <world name="plant">
+    <physics name="4ms" type="ignored">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics" />
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands" />
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster" />
+
+    <scene>
+      <ambient>0.65 0.65 0.65 1</ambient>
+      <background>0.70 0.74 0.80 1</background>
+      <grid>false</grid>
+    </scene>
+    <light type="directional" name="sun">
+      <cast_shadows>false</cast_shadows>
+      <pose>0 0 12 0 0 0</pose>
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.3 0.2 -0.9</direction>
+    </light>
+
+    <!-- ===================== floor + painted markings ===================== -->
+    <model name="floor">
+      <static>true</static>
+      <pose>0 0 -0.002 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal><size>60 40</size></plane></geometry>
+          <surface><friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction></surface>
+        </collision>
+        <visual name="outside">
+          <geometry><plane><normal>0 0 1</normal><size>60 40</size></plane></geometry>
+          <material><ambient>0.45 0.47 0.45 1</ambient><diffuse>0.45 0.47 0.45 1</diffuse></material>
+        </visual>
+        <visual name="hall">
+          <pose>3.1 0 0.001 0 0 0</pose>
+          <geometry><box><size>18.2 16 0.001</size></box></geometry>
+          <material><ambient>0.52 0.58 0.55 1</ambient><diffuse>0.52 0.58 0.55 1</diffuse></material>
+        </visual>
+        <!-- main aisle (y = 0) and home branch (x = 2.2) -->
+        <visual name="route_main">
+          <pose>6.5 0 0.002 0 0 0</pose>
+          <geometry><box><size>11.2 0.05 0.001</size></box></geometry>
+          <material><ambient>0.95 0.80 0.10 1</ambient><diffuse>0.95 0.80 0.10 1</diffuse><emissive>0.3 0.25 0.0 1</emissive></material>
+        </visual>
+        <visual name="route_home">
+          <pose>2.2 -1.5 0.002 0 0 0</pose>
+          <geometry><box><size>0.05 3.0 0.001</size></box></geometry>
+          <material><ambient>0.95 0.80 0.10 1</ambient><diffuse>0.95 0.80 0.10 1</diffuse><emissive>0.3 0.25 0.0 1</emissive></material>
+        </visual>
+        <!-- pallet station zone (blue) -->
+        <visual name="zone_station">
+          <pose>0.6 0 0.002 0 0 0</pose>
+          <geometry><box><size>2.6 1.6 0.001</size></box></geometry>
+          <material><ambient>0.20 0.42 0.78 1</ambient><diffuse>0.20 0.42 0.78 1</diffuse></material>
+        </visual>
+        <!-- loading dock zone (hatched look: orange) -->
+        <visual name="zone_dock">
+          <pose>11.3 0 0.002 0 0 0</pose>
+          <geometry><box><size>1.8 2.8 0.001</size></box></geometry>
+          <material><ambient>0.92 0.52 0.12 1</ambient><diffuse>0.92 0.52 0.12 1</diffuse></material>
+        </visual>
+        <!-- home / charger spot (green) -->
+        <visual name="zone_home">
+          <pose>2.2 -3.0 0.002 0 0 0</pose>
+          <geometry><box><size>0.9 1.0 0.001</size></box></geometry>
+          <material><ambient>0.20 0.70 0.35 1</ambient><diffuse>0.20 0.70 0.35 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ===================== hall walls (dock door in the +X wall) ===================== -->
+    <model name="walls">
+      <static>true</static>
+      <link name="link">
+        <collision name="w_south"><pose>3.1 -8.1 1.5 0 0 0</pose><geometry><box><size>18.4 0.2 3</size></box></geometry></collision>
+        <collision name="w_north"><pose>3.1 8.1 1.5 0 0 0</pose><geometry><box><size>18.4 0.2 3</size></box></geometry></collision>
+        <collision name="w_west"><pose>-6.1 0 1.5 0 0 0</pose><geometry><box><size>0.2 16.4 3</size></box></geometry></collision>
+        <collision name="w_east_s"><pose>12.3 -4.85 1.5 0 0 0</pose><geometry><box><size>0.2 6.5 3</size></box></geometry></collision>
+        <collision name="w_east_n"><pose>12.3 4.85 1.5 0 0 0</pose><geometry><box><size>0.2 6.5 3</size></box></geometry></collision>
+        <visual name="w_south"><pose>3.1 -8.1 1.5 0 0 0</pose><geometry><box><size>18.4 0.2 3</size></box></geometry>
+          <material><ambient>0.78 0.80 0.82 1</ambient><diffuse>0.78 0.80 0.82 1</diffuse></material></visual>
+        <visual name="w_north"><pose>3.1 8.1 1.5 0 0 0</pose><geometry><box><size>18.4 0.2 3</size></box></geometry>
+          <material><ambient>0.78 0.80 0.82 1</ambient><diffuse>0.78 0.80 0.82 1</diffuse></material></visual>
+        <visual name="w_west"><pose>-6.1 0 1.5 0 0 0</pose><geometry><box><size>0.2 16.4 3</size></box></geometry>
+          <material><ambient>0.78 0.80 0.82 1</ambient><diffuse>0.78 0.80 0.82 1</diffuse></material></visual>
+        <visual name="w_east_s"><pose>12.3 -4.85 1.5 0 0 0</pose><geometry><box><size>0.2 6.5 3</size></box></geometry>
+          <material><ambient>0.78 0.80 0.82 1</ambient><diffuse>0.78 0.80 0.82 1</diffuse></material></visual>
+        <visual name="w_east_n"><pose>12.3 4.85 1.5 0 0 0</pose><geometry><box><size>0.2 6.5 3</size></box></geometry>
+          <material><ambient>0.78 0.80 0.82 1</ambient><diffuse>0.78 0.80 0.82 1</diffuse></material></visual>
+        <visual name="door_frame"><pose>12.3 0 2.9 0 0 0</pose><geometry><box><size>0.2 3.2 0.2</size></box></geometry>
+          <material><ambient>0.95 0.75 0.10 1</ambient><diffuse>0.95 0.75 0.10 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ===================== charger at home ===================== -->
+    <model name="charger">
+      <static>true</static>
+      <pose>2.2 -3.62 0 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><pose>0 0 0.2 0 0 0</pose><geometry><box><size>0.4 0.12 0.4</size></box></geometry></collision>
+        <visual name="v"><pose>0 0 0.2 0 0 0</pose><geometry><box><size>0.4 0.12 0.4</size></box></geometry>
+          <material><ambient>0.15 0.16 0.18 1</ambient><diffuse>0.15 0.16 0.18 1</diffuse></material></visual>
+        <visual name="led"><pose>0 0.061 0.33 0 0 0</pose><geometry><box><size>0.12 0.002 0.03</size></box></geometry>
+          <material><ambient>0.2 0.9 0.4 1</ambient><diffuse>0.2 0.9 0.4 1</diffuse><emissive>0.1 0.6 0.2 1</emissive></material></visual>
+      </link>
+    </model>
+
+    <!-- ===================== production cells (generated from config/plant.yaml) ===================== -->
+    <!-- @@CELLS@@ -->
+
+    <!-- ===================== stations, truck, pallet, AMR ===================== -->
+    <include>
+      <name>pallet_station</name>
+      <uri>model://roller_station</uri>
+      <!-- z = -0.002: same floor level as the AMR, so both decks are at exactly the same height -->
+      <pose>0 0 -0.002 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>box_truck</name>
+      <uri>model://box_truck</uri>
+      <pose>12.42 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>truck_station</name>
+      <uri>model://roller_station</uri>
+      <pose>13.2 0 -0.002 0 0 3.14159265</pose>
+    </include>
+
+    <include>
+      <name>pallet</name>
+      <uri>model://pallet</uri>
+      <pose>0 0 0.789 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>ld60</name>
+      <uri>model://ld60</uri>
+      <pose>2.2 -3.0 0.002 0 0 1.5707963</pose>
+    </include>
+  </world>
+</sdf>

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LD-60 Plant Control</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">LD</div>
+    <div>
+      <div class="brand-title">LD-60 Plant Control</div>
+      <div class="brand-sub">4 × TM12S palletizing · Omron LD-60 logistics · ROS 2 Lyrical / Gazebo</div>
+    </div>
+  </div>
+  <div class="status-wrap"><span id="statusPill" class="pill pill-BOOTING">CONNECTING</span></div>
+  <div class="task" id="taskText">—</div>
+  <div class="speed">
+    <label for="speed">Max speed</label>
+    <input id="speed" type="range" min="0.1" max="1.35" step="0.05" value="1.0">
+    <span id="speedVal">1.00 m/s</span>
+  </div>
+  <div class="run-controls">
+    <button id="btnPause" class="btn">⏸ Pause</button>
+    <button id="btnStop" class="btn">■ Stop</button>
+    <button id="btnReset" class="btn">↺ Reset</button>
+    <button id="btnEstop" class="btn btn-estop">E-STOP</button>
+  </div>
+</header>
+
+<section class="kpis">
+  <div class="kpi"><div class="kpi-label">Position (x, y, θ)</div><div class="kpi-val small" id="kPose">—</div></div>
+  <div class="kpi"><div class="kpi-label">Speed</div><div class="kpi-val" id="kSpeed">—</div></div>
+  <div class="kpi"><div class="kpi-label">Battery</div><div class="kpi-val"><span id="kBatt">—</span><div class="bar"><i id="battBar"></i></div></div></div>
+  <div class="kpi"><div class="kpi-label">Payload</div><div class="kpi-val small" id="kPayload">—</div></div>
+  <div class="kpi"><div class="kpi-label">Location</div><div class="kpi-val small" id="kGoal">—</div></div>
+  <div class="kpi"><div class="kpi-label">Missions</div><div class="kpi-val" id="kMissions">0</div></div>
+  <div class="kpi"><div class="kpi-label">Last cycle</div><div class="kpi-val" id="kCycle">—</div></div>
+  <div class="kpi"><div class="kpi-label">Odometer</div><div class="kpi-val" id="kOdo">—</div></div>
+</section>
+
+<section class="kpis plant-kpis">
+  <div class="kpi"><div class="kpi-label">Plant</div><div class="kpi-val small"><span id="plantPill" class="pill pill-BOOTING">—</span></div></div>
+  <div class="kpi"><div class="kpi-label">Pallet fill</div><div class="kpi-val"><span id="pFill">0/32</span><div class="bar"><i id="fillBar"></i></div></div></div>
+  <div class="kpi"><div class="kpi-label">Boxes made / palletized</div><div class="kpi-val small" id="pBoxes">—</div></div>
+  <div class="kpi"><div class="kpi-label">Pallets delivered</div><div class="kpi-val" id="pPallets">0</div></div>
+  <div class="kpi"><div class="kpi-label">Throughput</div><div class="kpi-val small" id="pThru">—</div></div>
+  <div class="kpi"><div class="kpi-label">Pallet cycle</div><div class="kpi-val small" id="pCycle">—</div></div>
+  <div class="kpi"><div class="kpi-label">AGV wait / arm wait</div><div class="kpi-val small" id="pWait">—</div></div>
+  <div class="kpi"><div class="kpi-label">Logistics</div><div class="kpi-val small" id="pLog">—</div></div>
+</section>
+
+<section class="kpis plant-kpis">
+  <div class="kpi"><div class="kpi-label">Truck</div><div class="kpi-val small" id="tState">—</div></div>
+  <div class="kpi"><div class="kpi-label">Truck load</div><div class="kpi-val"><span id="tFill">0/64</span><div class="bar"><i id="tBar"></i></div></div></div>
+  <div class="kpi"><div class="kpi-label">Boxes loaded</div><div class="kpi-val" id="tLoaded">0</div></div>
+  <div class="kpi"><div class="kpi-label">Trucks dispatched</div><div class="kpi-val" id="tTrucks">0</div></div>
+  <div class="kpi"><div class="kpi-label">Pallets / hour</div><div class="kpi-val small" id="tPph">—</div></div>
+  <div class="kpi"><div class="kpi-label">AGV utilisation</div><div class="kpi-val small" id="tAgv">—</div></div>
+  <div class="kpi"><div class="kpi-label">Truck robot util</div><div class="kpi-val small" id="tUtil">—</div></div>
+  <div class="kpi"><div class="kpi-label">Arm util (avg)</div><div class="kpi-val small" id="tArms">—</div></div>
+</section>
+
+<div id="errorBar" class="errorbar" hidden></div>
+
+<main class="layout">
+  <section class="panel mapwrap">
+    <div class="panel-title">
+      <span>Map</span>
+      <span class="map-tools">
+        <button class="btn btn-sm" id="btnFit" title="Fit map">⤢ Fit</button>
+        <button class="btn btn-sm" id="btnCells" title="Zoom to the palletizing cells">▦ Cells</button>
+        <button class="btn btn-sm" id="btnFollow" title="Follow the robot">◎ Follow</button>
+        <span class="hint">wheel = zoom · drag = pan · click a goal to send the robot</span>
+      </span>
+    </div>
+    <svg id="map" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="goalMenu" class="goalmenu" hidden></div>
+  </section>
+
+  <aside class="panel side">
+    <nav class="tabs" id="tabs">
+      <button data-tab="plant" class="active">Plant</button>
+      <button data-tab="robot">AMR</button>
+      <button data-tab="missions">Missions</button>
+      <button data-tab="log">Log</button>
+    </nav>
+
+    <div class="tab-body" id="tab-plant">
+      <div class="row">
+        <button class="btn btn-accent" id="btnPStart">▶ Start production</button>
+        <button class="btn" id="btnPStop">■ Stop</button>
+        <button class="btn" id="btnPClear" title="All boxes back to the machines, pallet count reset">⟲ Clear cell</button>
+        <button class="btn" id="btnPReset">↺ Reset</button>
+      </div>
+      <div class="sect">Settings</div>
+      <div class="field2"><label>Arm speed</label><input id="armSpeed" type="range" min="0.1" max="1" step="0.05" value="0.8"><span id="armSpeedVal">80%</span></div>
+      <div class="field2"><label>Machine period</label><input id="machRate" type="range" min="2" max="20" step="0.5" value="6"><span id="machRateVal">6.0 s</span></div>
+      <label class="chk"><input type="checkbox" id="chkAuto" checked> AMR logistics automatic (dispatch at <span id="dispAt">24</span> boxes)</label>
+      <div class="sect">Cells</div>
+      <div id="laneCards"></div>
+      <div class="sect">Truck robot</div>
+      <div id="truckCard"></div>
+    </div>
+
+    <div class="tab-body" id="tab-robot" hidden>
+      <div class="sect">Go to goal</div>
+      <div class="goal-buttons" id="goalButtons"></div>
+      <div class="sect">Roller top (pallet)</div>
+      <div class="row">
+        <button class="btn" id="btnLoad" title="Rollers in: take the pallet from the station">⇤ Load pallet</button>
+        <button class="btn" id="btnUnload" title="Rollers out: give the pallet to the station">⇥ Unload pallet</button>
+      </div>
+      <div class="sect">Battery</div>
+      <div class="row"><button class="btn" id="btnCharge">⚡ Go charge</button></div>
+      <div class="sect">Status</div>
+      <div class="readout" id="roStatus">—</div>
+    </div>
+
+    <div class="tab-body" id="tab-missions" hidden>
+      <div class="mission-card">
+        <div class="mc-title">Pallet cycle (phase 1 test)</div>
+        <ol class="mc-steps">
+          <li>Go to Pallet Station, load pallet (rollers in, lock)</li>
+          <li>Drive to the truck, unload pallet (unlock, rollers out)</li>
+          <li>Truck unloading (simulated 3 s), take the empty pallet back</li>
+          <li>Return to the station, unload pallet</li>
+        </ol>
+        <label class="chk"><input type="checkbox" id="chkLoop"> Repeat (loop)</label>
+        <button class="btn btn-accent" id="btnMission">▶ Start mission</button>
+      </div>
+      <div class="sect">Queue</div>
+      <ol class="queue" id="queueList"><li class="muted">empty</li></ol>
+    </div>
+
+    <div class="tab-body" id="tab-log" hidden><div id="logList" class="loglist"></div></div>
+  </aside>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<div id="offline" class="offline" hidden>
+  <div class="offline-box">
+    <div class="spinner"></div>
+    <div><b>Connecting to the robot…</b><br><span class="muted">ws://<span id="wsHost"></span>:9090 — is <code>run_plant.sh</code> running?</span></div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

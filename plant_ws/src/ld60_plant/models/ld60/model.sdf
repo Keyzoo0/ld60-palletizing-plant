@@ -1,0 +1,237 @@
+<?xml version="1.0"?>
+<!--
+  Omron LD-60 style AMR, simplified from the datasheet:
+    body 699 x 500 x 383 mm, 62 kg, differential drive, 4 passive casters,
+    front safety laser, light discs on both sides.
+  Top module: roller (conveyor) top, deck at 750 mm, side guides, pallet lock.
+  Robot frame: +X = forward, origin on the floor between the drive wheels.
+-->
+<sdf version="1.9">
+  <model name="ld60">
+    <!-- ======================= chassis ======================= -->
+    <link name="base_link">
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0.18 0 0 0</pose>
+        <mass>62.0</mass>
+        <inertia>
+          <ixx>1.75</ixx><iyy>2.95</iyy><izz>3.85</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="body">
+        <pose>0 0 0.2165 0 0 0</pose>
+        <geometry><box><size>0.699 0.50 0.333</size></box></geometry>
+      </collision>
+      <!-- casters touch the floor: with a gap the robot rocked 0.4 deg onto them and the
+           lifted deck edge caught the pallet during hand-over -->
+      <collision name="caster_fl">
+        <pose>0.27 0.17 0.030 0 0 0</pose>
+        <geometry><sphere><radius>0.03</radius></sphere></geometry>
+        <surface><friction><ode><mu>0.0</mu><mu2>0.0</mu2></ode></friction></surface>
+      </collision>
+      <collision name="caster_fr">
+        <pose>0.27 -0.17 0.030 0 0 0</pose>
+        <geometry><sphere><radius>0.03</radius></sphere></geometry>
+        <surface><friction><ode><mu>0.0</mu><mu2>0.0</mu2></ode></friction></surface>
+      </collision>
+      <collision name="caster_rl">
+        <pose>-0.27 0.17 0.030 0 0 0</pose>
+        <geometry><sphere><radius>0.03</radius></sphere></geometry>
+        <surface><friction><ode><mu>0.0</mu><mu2>0.0</mu2></ode></friction></surface>
+      </collision>
+      <collision name="caster_rr">
+        <pose>-0.27 -0.17 0.030 0 0 0</pose>
+        <geometry><sphere><radius>0.03</radius></sphere></geometry>
+        <surface><friction><ode><mu>0.0</mu><mu2>0.0</mu2></ode></friction></surface>
+      </collision>
+
+      <visual name="body">
+        <pose>0 0 0.2215 0 0 0</pose>
+        <geometry><box><size>0.699 0.50 0.323</size></box></geometry>
+        <material><ambient>0.86 0.87 0.88 1</ambient><diffuse>0.86 0.87 0.88 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+      </visual>
+      <visual name="skirt">
+        <pose>0 0 0.075 0 0 0</pose>
+        <geometry><box><size>0.705 0.506 0.05</size></box></geometry>
+        <material><ambient>0.18 0.19 0.21 1</ambient><diffuse>0.18 0.19 0.21 1</diffuse></material>
+      </visual>
+      <visual name="top_cover">
+        <pose>0 0 0.379 0 0 0</pose>
+        <geometry><box><size>0.66 0.46 0.008</size></box></geometry>
+        <material><ambient>0.30 0.32 0.35 1</ambient><diffuse>0.30 0.32 0.35 1</diffuse></material>
+      </visual>
+      <!-- front safety laser window -->
+      <visual name="laser">
+        <pose>0.352 0 0.16 0 0 0</pose>
+        <geometry><box><size>0.01 0.30 0.05</size></box></geometry>
+        <material><ambient>0.05 0.05 0.06 1</ambient><diffuse>0.05 0.05 0.06 1</diffuse></material>
+      </visual>
+      <!-- light discs (LD status lights) -->
+      <visual name="light_left">
+        <pose>0 0.252 0.25 1.5708 0 0</pose>
+        <geometry><cylinder><radius>0.06</radius><length>0.006</length></cylinder></geometry>
+        <material><ambient>0.10 0.55 1.0 1</ambient><diffuse>0.10 0.55 1.0 1</diffuse><emissive>0.05 0.35 0.8 1</emissive></material>
+      </visual>
+      <visual name="light_right">
+        <pose>0 -0.252 0.25 1.5708 0 0</pose>
+        <geometry><cylinder><radius>0.06</radius><length>0.006</length></cylinder></geometry>
+        <material><ambient>0.10 0.55 1.0 1</ambient><diffuse>0.10 0.55 1.0 1</diffuse><emissive>0.05 0.35 0.8 1</emissive></material>
+      </visual>
+      <visual name="logo_band">
+        <pose>-0.352 0 0.30 0 0 0</pose>
+        <geometry><box><size>0.006 0.36 0.04</size></box></geometry>
+        <material><ambient>0.0 0.36 0.67 1</ambient><diffuse>0.0 0.36 0.67 1</diffuse></material>
+      </visual>
+    </link>
+
+    <!-- ======================= drive wheels ======================= -->
+    <link name="left_wheel">
+      <pose>0 0.21 0.1 -1.5708 0 0</pose>
+      <inertial>
+        <mass>2.0</mass>
+        <inertia><ixx>0.0055</ixx><iyy>0.0055</iyy><izz>0.01</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
+      </inertial>
+      <collision name="tire">
+        <geometry><cylinder><radius>0.1</radius><length>0.05</length></cylinder></geometry>
+        <surface><friction><ode><mu>1.2</mu><mu2>1.2</mu2></ode></friction></surface>
+      </collision>
+      <visual name="tire">
+        <geometry><cylinder><radius>0.1</radius><length>0.05</length></cylinder></geometry>
+        <material><ambient>0.08 0.08 0.08 1</ambient><diffuse>0.08 0.08 0.08 1</diffuse></material>
+      </visual>
+    </link>
+    <link name="right_wheel">
+      <pose>0 -0.21 0.1 -1.5708 0 0</pose>
+      <inertial>
+        <mass>2.0</mass>
+        <inertia><ixx>0.0055</ixx><iyy>0.0055</iyy><izz>0.01</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
+      </inertial>
+      <collision name="tire">
+        <geometry><cylinder><radius>0.1</radius><length>0.05</length></cylinder></geometry>
+        <surface><friction><ode><mu>1.2</mu><mu2>1.2</mu2></ode></friction></surface>
+      </collision>
+      <visual name="tire">
+        <geometry><cylinder><radius>0.1</radius><length>0.05</length></cylinder></geometry>
+        <material><ambient>0.08 0.08 0.08 1</ambient><diffuse>0.08 0.08 0.08 1</diffuse></material>
+      </visual>
+    </link>
+    <joint name="left_wheel_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>left_wheel</child>
+      <axis><xyz expressed_in="__model__">0 1 0</xyz><limit><lower>-1e16</lower><upper>1e16</upper></limit></axis>
+    </joint>
+    <joint name="right_wheel_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>right_wheel</child>
+      <axis><xyz expressed_in="__model__">0 1 0</xyz><limit><lower>-1e16</lower><upper>1e16</upper></limit></axis>
+    </joint>
+
+    <!-- ======================= roller top module ======================= -->
+    <link name="roller_deck">
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0.60 0 0 0</pose>
+        <mass>18.0</mass>
+        <inertia><ixx>0.5</ixx><iyy>0.8</iyy><izz>1.0</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
+      </inertial>
+      <!-- conveying surface, top at z = 0.750 -->
+      <collision name="deck">
+        <pose>0 0 0.735 0 0 0</pose>
+        <geometry><box><size>0.68 0.48 0.03</size></box></geometry>
+        <surface>
+          <friction><ode><mu>0.8</mu><mu2>150</mu2><fdir1>0 1 0</fdir1></ode></friction>
+        </surface>
+      </collision>
+      <!-- side guides keep the pallet centred (2 cm play per side) -->
+      <collision name="guide_left">
+        <pose>0 0.255 0.775 0 0 0</pose>
+        <geometry><box><size>0.68 0.02 0.05</size></box></geometry>
+      </collision>
+      <collision name="guide_right">
+        <pose>0 -0.255 0.775 0 0 0</pose>
+        <geometry><box><size>0.68 0.02 0.05</size></box></geometry>
+      </collision>
+      <collision name="frame">
+        <pose>0 0 0.55 0 0 0</pose>
+        <geometry><box><size>0.62 0.42 0.33</size></box></geometry>
+      </collision>
+
+      <visual name="frame">
+        <pose>0 0 0.55 0 0 0</pose>
+        <geometry><box><size>0.62 0.42 0.33</size></box></geometry>
+        <material><ambient>0.22 0.24 0.27 1</ambient><diffuse>0.22 0.24 0.27 1</diffuse></material>
+      </visual>
+      <visual name="deck_plate">
+        <pose>0 0 0.727 0 0 0</pose>
+        <geometry><box><size>0.68 0.48 0.014</size></box></geometry>
+        <material><ambient>0.55 0.58 0.62 1</ambient><diffuse>0.55 0.58 0.62 1</diffuse></material>
+      </visual>
+      <visual name="roller_1"><pose>-0.30 0 0.74 1.5708 0 0</pose><geometry><cylinder><radius>0.012</radius><length>0.46</length></cylinder></geometry><material><ambient>0.75 0.77 0.80 1</ambient><diffuse>0.75 0.77 0.80 1</diffuse></material></visual>
+      <visual name="roller_2"><pose>-0.225 0 0.74 1.5708 0 0</pose><geometry><cylinder><radius>0.012</radius><length>0.46</length></cylinder></geometry><material><ambient>0.75 0.77 0.80 1</ambient><diffuse>0.75 0.77 0.80 1</diffuse></material></visual>
+      <visual name="roller_3"><pose>-0.15 0 0.74 1.5708 0 0</pose><geometry><cylinder><radius>0.012</radius><length>0.46</length></cylinder></geometry><material><ambient>0.75 0.77 0.80 1</ambient><diffuse>0.75 0.77 0.80 1</diffuse></material></visual>
+      <visual name="roller_4"><pose>-0.075 0 0.74 1.5708 0 0</pose><geometry><cylinder><radius>0.012</radius><length>0.46</length></cylinder></geometry><material><ambient>0.75 0.77 0.80 1</ambient><diffuse>0.75 0.77 0.80 1</diffuse></material></visual>
+      <visual name="roller_5"><pose>0.0 0 0.74 1.5708 0 0</pose><geometry><cylinder><radius>0.012</radius><length>0.46</length></cylinder></geometry><material><ambient>0.75 0.77 0.80 1</ambient><diffuse>0.75 0.77 0.80 1</diffuse></material></visual>
+      <visual name="roller_6"><pose>0.075 0 0.74 1.5708 0 0</pose><geometry><cylinder><radius>0.012</radius><length>0.46</length></cylinder></geometry><material><ambient>0.75 0.77 0.80 1</ambient><diffuse>0.75 0.77 0.80 1</diffuse></material></visual>
+      <visual name="roller_7"><pose>0.15 0 0.74 1.5708 0 0</pose><geometry><cylinder><radius>0.012</radius><length>0.46</length></cylinder></geometry><material><ambient>0.75 0.77 0.80 1</ambient><diffuse>0.75 0.77 0.80 1</diffuse></material></visual>
+      <visual name="roller_8"><pose>0.225 0 0.74 1.5708 0 0</pose><geometry><cylinder><radius>0.012</radius><length>0.46</length></cylinder></geometry><material><ambient>0.75 0.77 0.80 1</ambient><diffuse>0.75 0.77 0.80 1</diffuse></material></visual>
+      <visual name="roller_9"><pose>0.30 0 0.74 1.5708 0 0</pose><geometry><cylinder><radius>0.012</radius><length>0.46</length></cylinder></geometry><material><ambient>0.75 0.77 0.80 1</ambient><diffuse>0.75 0.77 0.80 1</diffuse></material></visual>
+      <visual name="guide_left">
+        <pose>0 0.255 0.775 0 0 0</pose>
+        <geometry><box><size>0.68 0.02 0.05</size></box></geometry>
+        <material><ambient>0.95 0.75 0.10 1</ambient><diffuse>0.95 0.75 0.10 1</diffuse></material>
+      </visual>
+      <visual name="guide_right">
+        <pose>0 -0.255 0.775 0 0 0</pose>
+        <geometry><box><size>0.68 0.02 0.05</size></box></geometry>
+        <material><ambient>0.95 0.75 0.10 1</ambient><diffuse>0.95 0.75 0.10 1</diffuse></material>
+      </visual>
+    </link>
+    <joint name="top_module_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>roller_deck</child>
+    </joint>
+
+    <!-- ======================= plugins ======================= -->
+    <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>0.42</wheel_separation>
+      <wheel_radius>0.1</wheel_radius>
+      <topic>/model/ld60/cmd_vel</topic>
+      <odom_topic>/model/ld60/odometry</odom_topic>
+      <odom_publish_frequency>20</odom_publish_frequency>
+      <max_linear_acceleration>1.0</max_linear_acceleration>
+      <min_linear_acceleration>-2.0</min_linear_acceleration>
+      <max_angular_acceleration>6.3</max_angular_acceleration>
+      <min_angular_acceleration>-6.3</min_angular_acceleration>
+      <max_linear_velocity>1.8</max_linear_velocity>
+      <min_linear_velocity>-1.8</min_linear_velocity>
+      <max_angular_velocity>3.14</max_angular_velocity>
+      <min_angular_velocity>-3.14</min_angular_velocity>
+    </plugin>
+
+    <plugin filename="gz-sim-track-controller-system" name="gz::sim::systems::TrackController">
+      <link>roller_deck</link>
+      <odometry_publish_frequency>1</odometry_publish_frequency>
+    </plugin>
+
+    <!-- pallet lock: holds the pallet while driving (real roller tops use stoppers) -->
+    <plugin filename="gz-sim-detachable-joint-system" name="gz::sim::systems::DetachableJoint">
+      <parent_link>roller_deck</parent_link>
+      <child_model>pallet</child_model>
+      <child_link>link</child_link>
+      <attach_topic>/ld60/pallet_lock/attach</attach_topic>
+      <detach_topic>/ld60/pallet_lock/detach</detach_topic>
+      <output_topic>/ld60/pallet_lock/state</output_topic>
+    </plugin>
+    <!-- own pose only, so the AMR manager need not parse every entity of the plant (CPU) -->
+    <plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
+      <publish_link_pose>false</publish_link_pose>
+      <publish_model_pose>true</publish_model_pose>
+      <publish_nested_model_pose>false</publish_nested_model_pose>
+      <use_pose_vector_msg>true</use_pose_vector_msg>
+      <update_frequency>30</update_frequency>
+    </plugin>
+  </model>
+</sdf>
